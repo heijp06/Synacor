@@ -32,6 +32,8 @@ executable Synacor
     -- other-extensions:
     build-depends:
         base ^>=4.17.2.1,
+        bytestring,
+        split,
         MissingH,
         Synacor
 
