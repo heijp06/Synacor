@@ -6,9 +6,12 @@ module Processor
     , run
     ) where
 
+import Control.Lens.At (ix)
+import Control.Lens.Setter ((.~))
 import Control.Monad.State (State, get, put, execState, unless, when)
 import Data.Array ((!), Array)
 import Data.Char (chr)
+import Data.Function ((&))
 import GHC.Arr (listArray)
 import Prelude hiding (read)
 
@@ -22,10 +25,16 @@ data Processor = Processor { memory :: Array Int Int
 
 type ProcessorState = State Processor
 
+memSize :: Int
+memSize = 32768
+
+numberOfRegisters :: Int
+numberOfRegisters = 8
+
 processor :: [Int] -> Processor
 processor code = Processor mem False 0 (replicate 8 0) "" ""
     where
-        mem = listArray (0, 32767) $ code ++ replicate (32768 - length code) 0
+        mem = listArray (0, memSize - 1) $ code ++ replicate (memSize - length code) 0
 
 run :: Processor -> Processor
 run = execState doRun
@@ -43,14 +52,27 @@ read = do
     let value = memory ! instructionPointer
     put Processor { instructionPointer = instructionPointer + 1, .. }
     case value of
-        _ | 0 <= value && value < 32768 -> return value
-        _ | 32768 <= value && value < 32776 -> return $ registers !! (value - 32768)
+        _ | 0 <= value && value < memSize -> return value
+        _ | memSize <= value && value < memSize + 8 -> return $ registers !! (value - memSize)
         _ -> do
                 raise $ "Invalid value while reading: " ++ show value
                 return (-1)
 
+register :: ProcessorState Int
+register = do
+    Processor{..} <- get
+    let reg = memory ! instructionPointer - memSize
+    if reg >= 0 || reg < numberOfRegisters
+        then do
+            put Processor { instructionPointer = instructionPointer + 1, .. }
+            return reg
+        else do
+            raise $ "Invalid register " ++ show reg
+            return (-1)
+
 execute :: Int -> ProcessorState ()
 execute 0 = halt
+execute 1 = set
 execute 6 = jmp
 execute 7 = jt
 execute 8 = jf
@@ -60,6 +82,13 @@ execute ins = raise $ "Instruction not implemented: " ++ show ins ++ "."
 
 halt :: ProcessorState ()
 halt = raise "Process halted."
+
+set :: ProcessorState ()
+set = do
+    reg <- register
+    value <- read
+    Processor{..} <- get
+    put Processor { registers = registers & ix reg .~ value, .. }
 
 jmp :: ProcessorState ()
 jmp = do
