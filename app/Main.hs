@@ -44,7 +44,9 @@ loop proc = do
       when (msg == inputPending) $ do
           putChar '\n'
           line <- getLine
-          loop $ setInput proc' (line ++ "\n")
+          if line == "quit"
+            then return ()
+            else loop $ setInput proc' (line ++ "\n")
     else loop proc'
 
 dump :: Processor -> IO ()
