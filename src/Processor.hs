@@ -19,6 +19,7 @@ data Processor = Processor { memory :: Array Int Int
                            , halted :: Bool
                            , instructionPointer :: Int
                            , registers :: [Int]
+                           , stack :: [Int]
                            , output :: String
                            , err :: String
                            }
@@ -32,7 +33,7 @@ numberOfRegisters :: Int
 numberOfRegisters = 8
 
 processor :: [Int] -> Processor
-processor code = Processor mem False 0 (replicate 8 0) "" ""
+processor code = Processor mem False 0 (replicate 8 0) [] "" ""
     where
         mem = listArray (0, memSize - 1) $ code ++ replicate (memSize - length code) 0
 
@@ -77,6 +78,7 @@ setRegister reg value = do
 execute :: Int -> ProcessorState ()
 execute 0 = halt
 execute 1 = set
+execute 2 = push
 execute 4 = eq
 execute 6 = jmp
 execute 7 = jt
@@ -94,6 +96,12 @@ set = do
     reg <- register
     value <- read
     setRegister reg value
+
+push :: ProcessorState ()
+push = do
+    value <- read
+    Processor{..} <- get
+    put Processor { stack = value : stack, .. }
 
 eq :: ProcessorState ()
 eq = do
