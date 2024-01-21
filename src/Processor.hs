@@ -95,6 +95,7 @@ execute 14 = not
 execute 15 = rmem
 execute 16 = wmem
 execute 17 = call
+execute 18 = ret
 execute 19 = out
 execute 21 = noop
 execute ins = raise $ "Instruction not implemented: " ++ show ins ++ "."
@@ -216,6 +217,12 @@ call = do
     addr <- read
     Processor{..} <- get
     put Processor { stack = instructionPointer : stack, instructionPointer = addr, .. }
+
+ret :: ProcessorState ()
+ret = do
+    Processor{..} <- get
+    when (null stack) $ raise "Return with empty stack."
+    put Processor { stack = tail stack, instructionPointer = head stack, .. }
 
 out :: ProcessorState ()
 out = do
