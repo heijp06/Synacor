@@ -41,12 +41,12 @@ loop proc = do
       let msg = err proc'
       putStrLn msg
       setSGR [Reset]
-      when (msg /= inputPending) $ return ()
-      putChar '\n'
-      line <- getLine
-      loop $ setInput proc' (line ++ "\n")
+      when (msg == inputPending) $ do
+          putChar '\n'
+          line <- getLine
+          loop $ setInput proc' (line ++ "\n")
     else loop proc'
-  
+
 dump :: Processor -> IO ()
 dump Processor{..} = do
   putChar '\n'
