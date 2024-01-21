@@ -81,6 +81,7 @@ execute 1 = set
 execute 2 = push
 execute 3 = pop
 execute 4 = eq
+execute 5 = gt
 execute 6 = jmp
 execute 7 = jt
 execute 8 = jf
@@ -118,6 +119,13 @@ eq = do
     arg1 <- read
     arg2 <- read
     setRegister reg $ if arg1 == arg2 then 1 else 0
+
+gt :: ProcessorState ()
+gt = do
+    reg <- register
+    arg1 <- read
+    arg2 <- read
+    setRegister reg $ if arg1 > arg2 then 1 else 0
 
 jmp :: ProcessorState ()
 jmp = do
