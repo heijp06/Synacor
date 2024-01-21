@@ -6,6 +6,7 @@ import Control.Monad (unless, when)
 import qualified Data.ByteString as B
 import Data.Hash.MD5 (Str(Str), md5s)
 import Data.List.Split (chunksOf)
+import Data.Serialize (decode, encode)
 import System.Console.ANSI (setSGR, SGR (SetColor, Reset), ConsoleLayer (Foreground), ColorIntensity (Vivid), Color (Yellow, Red))
 import System.Environment (getArgs)
 import System.IO (openBinaryFile, IOMode (ReadMode))
@@ -44,9 +45,20 @@ loop proc = do
       when (msg == inputPending) $ do
           putChar '\n'
           line <- getLine
-          if line == "quit"
-            then return ()
-            else loop $ setInput proc' (line ++ "\n")
+          case line of
+            "quit" -> return ()
+            "save" -> do
+              let image = encode proc'
+              B.writeFile "state.bin" image
+              return ()
+            "load" -> do
+              image <- B.readFile "state.bin"
+              case decode image of
+                Right proc'' -> loop proc''
+                _ -> do
+                  print "Load failed"
+                  return ()
+            _ -> loop $ setInput proc' (line ++ "\n")
     else loop proc'
 
 dump :: Processor -> IO ()

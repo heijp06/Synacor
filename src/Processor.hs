@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards, DeriveGeneric #-}
 
 module Processor
     ( Processor(..)
@@ -15,7 +15,9 @@ import Data.Array ((!), (//), Array)
 import Data.Bits ((.&.), (.|.), complement)
 import Data.Char (chr, ord)
 import Data.Function ((&))
+import Data.Serialize (Serialize)
 import GHC.Arr (listArray)
+import GHC.Generics (Generic)
 import Prelude hiding (and, not, or, read)
 
 data Processor = Processor { memory :: Array Int Int
@@ -26,7 +28,9 @@ data Processor = Processor { memory :: Array Int Int
                            , input :: String
                            , output :: String
                            , err :: String
-                           }
+                           } deriving Generic
+
+instance Serialize Processor
 
 type ProcessorState = State Processor
 
