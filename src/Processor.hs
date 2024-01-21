@@ -79,6 +79,7 @@ execute :: Int -> ProcessorState ()
 execute 0 = halt
 execute 1 = set
 execute 2 = push
+execute 3 = pop
 execute 4 = eq
 execute 6 = jmp
 execute 7 = jt
@@ -102,6 +103,14 @@ push = do
     value <- read
     Processor{..} <- get
     put Processor { stack = value : stack, .. }
+
+pop :: ProcessorState ()
+pop = do
+    reg <- register
+    Processor{..} <- get
+    when (null stack) $ raise "Pop from empty stack"
+    put Processor { stack = tail stack, .. }
+    setRegister reg $ head stack
 
 eq :: ProcessorState ()
 eq = do
