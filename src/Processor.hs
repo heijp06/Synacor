@@ -15,6 +15,7 @@ import Prelude hiding (read)
 data Processor = Processor { memory :: Array Int Int
                            , halted :: Bool
                            , instructionPointer :: Int
+                           , registers :: [Int]
                            , output :: String
                            , err :: String
                            }
@@ -22,7 +23,7 @@ data Processor = Processor { memory :: Array Int Int
 type ProcessorState = State Processor
 
 processor :: [Int] -> Processor
-processor code = Processor mem False 0 "" ""
+processor code = Processor mem False 0 (replicate 8 0) "" ""
     where
         mem = listArray (0, 32767) $ code ++ replicate (32768 - length code) 0
 
@@ -41,7 +42,12 @@ read = do
     Processor{..} <- get
     let value = memory ! instructionPointer
     put Processor { instructionPointer = instructionPointer + 1, .. }
-    return value
+    case value of
+        _ | 0 <= value && value < 32768 -> return value
+        _ | 32768 <= value && value < 32776 -> return $ registers !! (value - 32768)
+        _ -> do
+                raise $ "Invalid value while reading: " ++ show value
+                return (-1)
 
 execute :: Int -> ProcessorState ()
 execute 0 = halt
