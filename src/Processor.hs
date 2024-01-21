@@ -92,6 +92,7 @@ execute 11 = mod'
 execute 12 = and
 execute 13 = or
 execute 14 = not
+execute 15 = rmem
 execute 17 = call
 execute 19 = out
 execute 21 = noop
@@ -194,6 +195,13 @@ not = do
     reg <- register
     arg1 <- read
     setRegister reg $ complement arg1 .&. (memSize - 1)
+
+rmem :: ProcessorState ()
+rmem = do
+    reg <- register
+    addr <- read
+    Processor{..} <- get
+    setRegister reg $ memory ! addr
 
 call :: ProcessorState ()
 call = do
