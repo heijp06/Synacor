@@ -52,6 +52,7 @@ read = do
 execute :: Int -> ProcessorState ()
 execute 0 = halt
 execute 6 = jmp
+execute 7 = jt
 execute 19 = out
 execute 21 = noop
 execute ins = raise $ "Instruction not implemented: " ++ show ins ++ "."
@@ -64,6 +65,13 @@ jmp = do
     i <- read
     Processor{..} <- get
     put Processor { instructionPointer = i, .. }
+
+jt :: ProcessorState ()
+jt = do
+    flag <- read
+    ins <- read
+    Processor{..} <- get
+    unless (flag == 0) $ put Processor { instructionPointer = ins, .. }
 
 out :: ProcessorState ()
 out = do
