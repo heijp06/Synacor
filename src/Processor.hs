@@ -77,6 +77,7 @@ setRegister reg value = do
 execute :: Int -> ProcessorState ()
 execute 0 = halt
 execute 1 = set
+execute 4 = eq
 execute 6 = jmp
 execute 7 = jt
 execute 8 = jf
@@ -93,6 +94,13 @@ set = do
     reg <- register
     value <- read
     setRegister reg value
+
+eq :: ProcessorState ()
+eq = do
+    reg <- register
+    arg1 <- read
+    arg2 <- read
+    setRegister reg $ if arg1 == arg2 then 1 else 0
 
 jmp :: ProcessorState ()
 jmp = do
