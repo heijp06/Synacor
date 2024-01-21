@@ -1,7 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Processor
-    ( Processor(halted, err, output)
+    ( Processor(..)
     , inputPending
     , processor
     , run
@@ -42,7 +42,10 @@ processor code = Processor mem False 0 (replicate 8 0) [] "" "" ""
         mem = listArray (0, memSize - 1) $ code ++ replicate (memSize - length code) 0
 
 run :: Processor -> Processor
-run = execState doRun
+run proc = execState doRun $ clear proc
+
+clear :: Processor -> Processor
+clear proc = proc { halted = False, output = "", err = "" }
 
 setInput :: Processor -> String -> Processor
 setInput proc xs = proc { input = xs }

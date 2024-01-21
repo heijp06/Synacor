@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Main where
 
 import Control.Monad (unless, when)
@@ -40,6 +42,23 @@ loop proc = do
       setSGR [Reset]
       when (msg /= inputPending) $ return ()
       putChar '\n'
-      input <- getLine
-      loop $ setInput proc' input
+      line <- getLine
+      loop $ setInput proc' (line ++ "\n")
     else loop proc'
+  
+dump :: Processor -> IO ()
+dump Processor{..} = do
+  putStr "Halted:\t\t"
+  print halted
+  putStr "IP:\t\t"
+  print instructionPointer
+  putStr "Registers:\t"
+  print registers
+  putStr "Stack:\t\t"
+  print stack
+  putStr "Input:\t\t"
+  print input
+  putStr "Output:\t\t"
+  print output
+  putStr "error:\t\t"
+  print err
