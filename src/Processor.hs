@@ -87,6 +87,7 @@ execute 6 = jmp
 execute 7 = jt
 execute 8 = jf
 execute 9 = add
+execute 10 = mult
 execute 12 = and
 execute 13 = or
 execute 14 = not
@@ -158,6 +159,13 @@ add = do
     arg1 <- read
     arg2 <- read
     setRegister reg $ (arg1 + arg2) `mod` memSize
+
+mult :: ProcessorState ()
+mult = do
+    reg <- register
+    arg1 <- read
+    arg2 <- read
+    setRegister reg $ (arg1 * arg2) `mod` memSize
 
 and :: ProcessorState ()
 and = do
