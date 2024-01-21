@@ -29,6 +29,7 @@ program = do
 
 loop :: Processor -> IO ()
 loop proc = do
+  dump proc
   let proc' = run proc
   let xs = output proc'
   setSGR [SetColor Foreground Vivid Yellow]
@@ -48,6 +49,8 @@ loop proc = do
   
 dump :: Processor -> IO ()
 dump Processor{..} = do
+  putChar '\n'
+  putStrLn $ replicate 80 '='
   putStr "Halted:\t\t"
   print halted
   putStr "IP:\t\t"
@@ -60,5 +63,7 @@ dump Processor{..} = do
   print input
   putStr "Output:\t\t"
   print output
-  putStr "error:\t\t"
+  putStr "Error:\t\t"
   print err
+  putStrLn $ replicate 80 '='
+  putChar '\n'
