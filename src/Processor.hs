@@ -9,7 +9,7 @@ module Processor
 import Control.Lens.At (ix)
 import Control.Lens.Setter ((.~))
 import Control.Monad.State (State, get, put, execState, unless, when)
-import Data.Array ((!), Array)
+import Data.Array ((!), (//), Array)
 import Data.Bits ((.&.), (.|.), complement)
 import Data.Char (chr)
 import Data.Function ((&))
@@ -93,6 +93,7 @@ execute 12 = and
 execute 13 = or
 execute 14 = not
 execute 15 = rmem
+execute 16 = wmem
 execute 17 = call
 execute 19 = out
 execute 21 = noop
@@ -202,6 +203,13 @@ rmem = do
     addr <- read
     Processor{..} <- get
     setRegister reg $ memory ! addr
+
+wmem :: ProcessorState ()
+wmem = do
+    addr <- read
+    value <- read
+    Processor{..} <- get
+    put Processor { memory = memory // [(addr, value)], .. }
 
 call :: ProcessorState ()
 call = do
