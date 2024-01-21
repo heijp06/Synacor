@@ -11,7 +11,7 @@ import Control.Lens.Setter ((.~))
 import Control.Monad.State (State, get, put, execState, unless, when)
 import Data.Array ((!), (//), Array)
 import Data.Bits ((.&.), (.|.), complement)
-import Data.Char (chr)
+import Data.Char (chr, ord)
 import Data.Function ((&))
 import GHC.Arr (listArray)
 import Prelude hiding (and, not, or, read)
@@ -21,6 +21,7 @@ data Processor = Processor { memory :: Array Int Int
                            , instructionPointer :: Int
                            , registers :: [Int]
                            , stack :: [Int]
+                           , input :: String
                            , output :: String
                            , err :: String
                            }
@@ -34,7 +35,7 @@ numberOfRegisters :: Int
 numberOfRegisters = 8
 
 processor :: [Int] -> Processor
-processor code = Processor mem False 0 (replicate 8 0) [] "" ""
+processor code = Processor mem False 0 (replicate 8 0) [] "" "" ""
     where
         mem = listArray (0, memSize - 1) $ code ++ replicate (memSize - length code) 0
 
@@ -97,6 +98,7 @@ execute 16 = wmem
 execute 17 = call
 execute 18 = ret
 execute 19 = out
+execute 20 = in'
 execute 21 = noop
 execute ins = raise $ "Instruction not implemented: " ++ show ins ++ "."
 
@@ -230,6 +232,16 @@ out = do
     Processor{..} <- get
     put Processor { output = output ++ [chr i], .. }
 
+in' :: ProcessorState ()
+in' = do
+    reg <- register
+    Processor{..} <- get
+    if null input
+        then raise inputPending
+        else do
+            put Processor { input = tail input, .. }
+            setRegister reg $ ord (head input)
+
 noop :: ProcessorState ()
 noop = return ()
 
@@ -237,3 +249,6 @@ raise :: String -> ProcessorState ()
 raise msg = do
     proc <- get
     put $ proc { err = msg, halted = True }
+
+inputPending :: String
+inputPending = "Input expected."
