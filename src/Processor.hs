@@ -10,11 +10,11 @@ import Control.Lens.At (ix)
 import Control.Lens.Setter ((.~))
 import Control.Monad.State (State, get, put, execState, unless, when)
 import Data.Array ((!), Array)
-import Data.Bits ((.&.))
+import Data.Bits ((.&.), (.|.))
 import Data.Char (chr)
 import Data.Function ((&))
 import GHC.Arr (listArray)
-import Prelude hiding (and, read)
+import Prelude hiding (and, or, read)
 
 data Processor = Processor { memory :: Array Int Int
                            , halted :: Bool
@@ -88,6 +88,7 @@ execute 7 = jt
 execute 8 = jf
 execute 9 = add
 execute 12 = and
+execute 13 = or
 execute 19 = out
 execute 21 = noop
 execute ins = raise $ "Instruction not implemented: " ++ show ins ++ "."
@@ -162,6 +163,13 @@ and = do
     arg1 <- read
     arg2 <- read
     setRegister reg $ arg1 .&. arg2
+
+or :: ProcessorState ()
+or = do
+    reg <- register
+    arg1 <- read
+    arg2 <- read
+    setRegister reg $ arg1 .|. arg2
 
 out :: ProcessorState ()
 out = do
