@@ -69,6 +69,10 @@ register = do
         else do
             raise $ "Invalid register " ++ show reg
             return (-1)
+setRegister :: Int -> Int -> ProcessorState ()
+setRegister reg value = do
+    Processor{..} <- get
+    put Processor { registers = registers & ix reg .~ value, .. }
 
 execute :: Int -> ProcessorState ()
 execute 0 = halt
@@ -76,6 +80,7 @@ execute 1 = set
 execute 6 = jmp
 execute 7 = jt
 execute 8 = jf
+execute 9 = add
 execute 19 = out
 execute 21 = noop
 execute ins = raise $ "Instruction not implemented: " ++ show ins ++ "."
@@ -87,8 +92,7 @@ set :: ProcessorState ()
 set = do
     reg <- register
     value <- read
-    Processor{..} <- get
-    put Processor { registers = registers & ix reg .~ value, .. }
+    setRegister reg value
 
 jmp :: ProcessorState ()
 jmp = do
@@ -109,6 +113,13 @@ jf = do
     ins <- read
     Processor{..} <- get
     when (flag == 0) $ put Processor { instructionPointer = ins, .. }
+
+add :: ProcessorState ()
+add = do
+    reg <- register
+    arg1 <- read
+    arg2 <- read
+    setRegister reg $ arg1 + arg2
 
 out :: ProcessorState ()
 out = do
