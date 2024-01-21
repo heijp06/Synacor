@@ -45,12 +45,19 @@ read = do
 
 execute :: Int -> ProcessorState ()
 execute 0 = halt
+execute 6 = jmp
 execute 19 = out
 execute 21 = noop
 execute ins = raise $ "Instruction not implemented: " ++ show ins ++ "."
 
 halt :: ProcessorState ()
 halt = raise "Process halted."
+
+jmp :: ProcessorState ()
+jmp = do
+    i <- read
+    Processor{..} <- get
+    put Processor { instructionPointer = i, .. }
 
 out :: ProcessorState ()
 out = do
