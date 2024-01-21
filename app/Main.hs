@@ -50,7 +50,7 @@ loop proc = do
             "save" -> do
               let image = encode proc'
               B.writeFile "state.bin" image
-              return ()
+              loop $ setInput proc' (line ++ "\n")
             "load" -> do
               image <- B.readFile "state.bin"
               case decode image of
