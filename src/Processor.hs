@@ -6,7 +6,7 @@ module Processor
     , run
     ) where
 
-import Control.Monad.State (State, get, put, execState, unless)
+import Control.Monad.State (State, get, put, execState, unless, when)
 import Data.Array ((!), Array)
 import Data.Char (chr)
 import GHC.Arr (listArray)
@@ -53,6 +53,7 @@ execute :: Int -> ProcessorState ()
 execute 0 = halt
 execute 6 = jmp
 execute 7 = jt
+execute 8 = jf
 execute 19 = out
 execute 21 = noop
 execute ins = raise $ "Instruction not implemented: " ++ show ins ++ "."
@@ -72,6 +73,13 @@ jt = do
     ins <- read
     Processor{..} <- get
     unless (flag == 0) $ put Processor { instructionPointer = ins, .. }
+
+jf :: ProcessorState ()
+jf = do
+    flag <- read
+    ins <- read
+    Processor{..} <- get
+    when (flag == 0) $ put Processor { instructionPointer = ins, .. }
 
 out :: ProcessorState ()
 out = do
