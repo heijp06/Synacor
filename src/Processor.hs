@@ -90,6 +90,7 @@ execute 9 = add
 execute 12 = and
 execute 13 = or
 execute 14 = not
+execute 17 = call
 execute 19 = out
 execute 21 = noop
 execute ins = raise $ "Instruction not implemented: " ++ show ins ++ "."
@@ -177,6 +178,12 @@ not = do
     reg <- register
     arg1 <- read
     setRegister reg $ complement arg1 .&. (memSize - 1)
+
+call :: ProcessorState ()
+call = do
+    addr <- read
+    Processor{..} <- get
+    put Processor { stack = instructionPointer : stack, instructionPointer = addr, .. }
 
 out :: ProcessorState ()
 out = do
