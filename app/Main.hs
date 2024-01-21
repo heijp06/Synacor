@@ -1,13 +1,14 @@
 module Main where
 
-import Control.Monad (unless)
+import Control.Monad (unless, when)
 import qualified Data.ByteString as B
 import Data.Hash.MD5 (Str(Str), md5s)
 import Data.List.Split (chunksOf)
 import System.Console.ANSI (setSGR, SGR (SetColor, Reset), ConsoleLayer (Foreground), ColorIntensity (Vivid), Color (Yellow, Red))
 import System.Environment (getArgs)
 import System.IO (openBinaryFile, IOMode (ReadMode))
-import Processor (Processor(..), processor, run)
+
+import Processor (Processor(..), inputPending, processor, run, setInput)
 
 main :: IO ()
 main = do
@@ -34,6 +35,11 @@ loop proc = do
   if halted proc'
     then do
       setSGR [SetColor Foreground Vivid Red]
-      putStrLn $ err proc'
+      let msg = err proc'
+      putStrLn msg
       setSGR [Reset]
+      when (msg /= inputPending) $ return ()
+      putChar '\n'
+      input <- getLine
+      loop $ setInput proc' input
     else loop proc'

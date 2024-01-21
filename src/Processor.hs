@@ -2,8 +2,10 @@
 
 module Processor
     ( Processor(halted, err, output)
+    , inputPending
     , processor
     , run
+    , setInput
     ) where
 
 import Control.Lens.At (ix)
@@ -41,6 +43,9 @@ processor code = Processor mem False 0 (replicate 8 0) [] "" "" ""
 
 run :: Processor -> Processor
 run = execState doRun
+
+setInput :: Processor -> String -> Processor
+setInput proc xs = proc { input = xs }
 
 doRun :: ProcessorState ()
 doRun = do
