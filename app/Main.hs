@@ -29,7 +29,7 @@ program = do
 
 loop :: Processor -> IO ()
 loop proc = do
-  dump proc
+  -- dump proc
   let proc' = run proc
   let xs = output proc'
   setSGR [SetColor Foreground Vivid Yellow]

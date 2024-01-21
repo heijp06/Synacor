@@ -245,7 +245,9 @@ in' = do
     reg <- register
     Processor{..} <- get
     if null input
-        then raise inputPending
+        then do
+            put Processor { instructionPointer = instructionPointer - 2, .. }
+            raise inputPending
         else do
             put Processor { input = tail input, .. }
             setRegister reg $ ord (head input)
