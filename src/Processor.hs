@@ -152,7 +152,7 @@ add = do
     reg <- register
     arg1 <- read
     arg2 <- read
-    setRegister reg $ arg1 + arg2
+    setRegister reg $ (arg1 + arg2) `mod` memSize
 
 out :: ProcessorState ()
 out = do
