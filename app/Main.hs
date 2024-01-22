@@ -50,7 +50,7 @@ loop proc = do
             "save" -> do
               let image = encode proc'
               B.writeFile "state.bin" image
-              loop $ setInput proc' (line ++ "\n")
+              loop $ setInput proc' "look\n"
             "load" -> do
               image <- B.readFile "state.bin"
               case decode image of
@@ -58,6 +58,9 @@ loop proc = do
                 _ -> do
                   print "Load failed"
                   return ()
+            "dump" -> do
+              dump proc'
+              loop $ setInput proc' "look\n"
             _ -> loop $ setInput proc' (line ++ "\n")
     else loop proc'
 
