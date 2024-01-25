@@ -6,6 +6,7 @@ module Processor
     , processor
     , run
     , setInput
+    , setReg7
     ) where
 
 import Control.Lens.At (ix)
@@ -53,6 +54,9 @@ clear proc = proc { halted = False, output = "", err = "" }
 
 setInput :: Processor -> String -> Processor
 setInput proc xs = proc { input = xs }
+
+setReg7 :: Processor -> Int -> Processor
+setReg7 Processor{..} value = Processor { registers = take 7 registers ++ [value], ..}
 
 doRun :: ProcessorState ()
 doRun = do

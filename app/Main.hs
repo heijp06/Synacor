@@ -11,7 +11,7 @@ import System.Console.ANSI (setSGR, SGR (SetColor, Reset), ConsoleLayer (Foregro
 import System.Environment (getArgs)
 import System.IO (openBinaryFile, IOMode (ReadMode))
 
-import Processor (Processor(..), inputPending, processor, run, setInput)
+import Processor (Processor(..), inputPending, processor, run, setInput, setReg7)
 
 main :: IO ()
 main = do
@@ -54,13 +54,15 @@ loop proc = do
             "load" -> do
               image <- B.readFile "state.bin"
               case decode image of
-                Right proc'' -> loop proc''
+                Right proc'' -> loop $ setInput proc'' "look\n"
                 _ -> do
                   print "Load failed"
                   return ()
             "dump" -> do
               dump proc'
               loop $ setInput proc' "look\n"
+            ('r':'e':'g':'7':' ':ys) ->
+              loop $ setReg7 proc' (read ys)
             _ -> loop $ setInput proc' (line ++ "\n")
     else loop proc'
 
