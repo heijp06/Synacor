@@ -19,7 +19,8 @@ common warnings
 library
     import:           warnings
     exposed-modules:
-        Processor
+        Processor,
+        Decompiler
     -- other-modules:
     -- other-extensions:
     build-depends:
