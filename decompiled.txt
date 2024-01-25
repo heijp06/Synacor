@@ -678,11 +678,11 @@
 1484 push reg4
 1486 push reg5
 1488 push reg6
-1490 set reg6 reg0
-1493 set reg5 reg1
-1496 rmem reg4 reg0
-1499 set reg1 0
-1502 add reg3 1 reg1
+1490 set reg6 reg0          -- reg6 = 28858, base address
+1493 set reg5 reg1          -- reg5 = 1553, subroutine
+1496 rmem reg4 reg0         -- reg4 = 1752, maxloop
+1499 set reg1 0             -- reg1 = 0, loopvar
+1502 add reg3 1 reg1        -- reg3 = reg1 + 1
 1506 gt reg0 reg3 reg4
 1510 jt reg0 1529
 1513 add reg3 reg3 reg6
