@@ -673,7 +673,7 @@
 1475 out p
 1477 out 10
 1479 halt
-1480 push reg0
+1480 push reg0              -- This seems to be some sort of generic printing routine.
 1482 push reg3
 1484 push reg4
 1486 push reg5

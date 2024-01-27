@@ -7,17 +7,17 @@ f()
     else if (r1 == 0)
     {
         r0--;
-	r1 = r7;
-	f();
+        r1 = r7;
+        f();
     }
     else
     {
         var temp = r0;
-	r1--;
-	f();
-	r1 = r0;
-	r0 = temp - 1;
-	f();
+        r1--;
+        f();
+        r1 = r0;
+        r0 = temp - 1;
+        f();
     }
 }
 
